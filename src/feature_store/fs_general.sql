@@ -9,7 +9,7 @@ WITH tb_rfv AS (
 
         SUM(CASE
                 WHEN pointsTransaction > 0 THEN pointsTransaction 
-            END) as pointsTotal
+            END) as valorPoints
 
     FROM transactions
 
