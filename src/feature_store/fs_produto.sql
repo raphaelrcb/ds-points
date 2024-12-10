@@ -1,6 +1,7 @@
 WITH tb_transactions_products AS (    
-    SELECT
-        *
+    SELECT  t1.*,
+            t2.NameProduct,
+            t2.QuantityProduct
 
     FROM transactions AS t1
 
@@ -56,11 +57,15 @@ tb_rn AS (
     SELECT  *,
             ROW_NUMBER() OVER (PARTITION BY idCustomer ORDER BY qtde DESC, points DESC)  as rnQtde
     FROM tb_group
-    ORDER BY idCustomer),
+    ORDER BY idCustomer
+),
+
 tb_produto_max as (
-SELECT * 
-FROM tb_rn 
-WHERE rnQtde = 1
+
+    SELECT * 
+    FROM tb_rn 
+    WHERE rnQtde = 1
+
 ) 
 
 SELECT  

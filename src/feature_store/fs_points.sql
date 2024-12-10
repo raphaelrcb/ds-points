@@ -7,7 +7,7 @@ WITH tb_pontos AS (
             THEN pointsTransaction
             ELSE 0
             END) AS saldoPointsD14,
-        SUM(CASE WHEN dtTransaction >= DATE('{date}', '-4 day')
+        SUM(CASE WHEN dtTransaction >= DATE('{date}', '-7 day')
             THEN pointsTransaction
             ELSE 0
             END) AS saldoPointsD7,
