@@ -1,5 +1,5 @@
 WITH tb_transactions_hour AS (    
-    SELECT  *,
+    SELECT  idCustomer,
             --STRFTIME data formatada pelo argumento especificado "%H" = hora e datetime converte o timestamp do BD pro formato de data
             pointsTransaction,
             CAST(STRFTIME('%H', DATETIME(dtTransaction, '-3 hour')) AS INTEGER)  AS hour

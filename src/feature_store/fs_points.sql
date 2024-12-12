@@ -4,76 +4,82 @@ WITH tb_pontos AS (
         SUM(pointsTransaction) as saldoPointsD21,
 
         SUM(CASE WHEN dtTransaction >= DATE('{date}', '-14 day')
-            THEN pointsTransaction
-            ELSE 0
+                   THEN pointsTransaction
+                ELSE 0
             END) AS saldoPointsD14,
         SUM(CASE WHEN dtTransaction >= DATE('{date}', '-7 day')
-            THEN pointsTransaction
-            ELSE 0
+                    THEN pointsTransaction
+                ELSE 0
             END) AS saldoPointsD7,
         
         SUM(CASE WHEN pointsTransaction > 0 
-            THEN pointsTransaction 
-            ELSE 0 
+                    THEN pointsTransaction 
+                ELSE 0 
             END) AS pointsAcumuladosD21,
 
-        SUM(CASE 
-            WHEN pointsTransaction > 0 
-            AND dtTransaction >= DATE('{date}', '-14 day') 
-            THEN pointsTransaction ELSE 0 
+        SUM(CASE WHEN pointsTransaction > 0 
+                AND dtTransaction >= DATE('{date}', '-14 day') 
+                    THEN pointsTransaction 
+                ELSE 0 
             END) AS pointsAcumuladosD14,
 
-        SUM(CASE 
-            WHEN pointsTransaction > 0 
-            AND dtTransaction >= DATE('{date}', '-7 day') 
-            THEN pointsTransaction ELSE 0 
+        SUM(CASE WHEN pointsTransaction > 0 
+                AND dtTransaction >= DATE('{date}', '-7 day') 
+                    THEN pointsTransaction ELSE 0 
             END) AS pointsAcumuladosD7,
  
-        SUM(CASE
-            WHEN pointsTransaction < 0 
-            THEN pointsTransaction ELSE 0 
+        SUM(CASE WHEN pointsTransaction < 0 
+                    THEN pointsTransaction 
+                ELSE 0 
             END) AS pointsResgatadosD21,
 
-        SUM(CASE 
-            WHEN pointsTransaction < 0 
-            AND dtTransaction >= DATE('{date}', '-14 day') 
-            THEN pointsTransaction ELSE 0 END) 
-            AS pointsResgatadosD14,
+        SUM(CASE WHEN pointsTransaction < 0 
+                AND dtTransaction >= DATE('{date}', '-14 day') 
+                    THEN pointsTransaction 
+                ELSE 0 
+        END) AS pointsResgatadosD14,
 
-        SUM(CASE 
-            WHEN pointsTransaction < 0 
-            AND dtTransaction >= DATE('{date}', '-7 day') 
-            THEN pointsTransaction ELSE 0 END) 
-            AS pointsResgatadosD7
+        SUM(CASE WHEN pointsTransaction < 0 
+                AND dtTransaction >= DATE('{date}', '-7 day') 
+                    THEN pointsTransaction 
+                ELSE 0
+         END) AS pointsResgatadosD7
  
-FROM transactions
+    FROM transactions
 
-WHERE dtTransaction < '{date}'
-AND dtTransaction >= DATE('{date}', '-21 day')
+    WHERE dtTransaction < '{date}'
+    AND dtTransaction >= DATE('{date}', '-21 day')
 
-GROUP BY idCustomer),
+    GROUP BY idCustomer
 
-tb_vida AS (SELECT t1.idCustomer,
+),
+
+tb_vida AS (
+    
+    SELECT t1.idCustomer,
        SUM(t2.pointsTransaction) AS saldoPoints,
-       SUM(CASE
-           WHEN t2.pointsTransaction > 0
-           THEN t2.pointsTransaction ELSE 0 
+       SUM(CASE WHEN t2.pointsTransaction > 0 
+                    THEN t2.pointsTransaction 
+                ELSE 0 
            END) AS pointsAcumuladosVida,
-       SUM(CASE
-           WHEN t2.pointsTransaction < 0
-           THEN t2.pointsTransaction ELSE 0 
+       SUM(CASE WHEN t2.pointsTransaction < 0
+                    THEN t2.pointsTransaction 
+                ELSE 0 
            END) AS pointsResgatadosVida,
+
         CAST(MAX(julianday('{date}') - julianday(dtTransaction))AS INTEGER) + 1 AS diasVida
 
 
-FROM tb_pontos AS t1
+    FROM tb_pontos AS t1
 
-LEFT JOIN transactions AS t2
-ON t1.idCustomer = t2.idCustomer
+    LEFT JOIN transactions AS t2
+    ON t1.idCustomer = t2.idCustomer
 
-WHERE t2.dtTransaction < '{date}'
+    WHERE t2.dtTransaction < '{date}'
 
-GROUP BY t1.idCustomer),
+    GROUP BY t1.idCustomer
+    
+),
 
 tb_join AS (
     SELECT t1.*,
@@ -82,9 +88,11 @@ tb_join AS (
        t2.pointsResgatadosVida,
        1.0 * t2.pointsAcumuladosVida / t2.diasVida as pointsPorDia
 
-FROM tb_pontos AS t1
-LEFT JOIN tb_vida AS t2
-ON t1.idCustomer = t2.idCustomer)
+    FROM tb_pontos AS t1
+
+    LEFT JOIN tb_vida AS t2
+    ON t1.idCustomer = t2.idCustomer
+)
 
 SELECT 
         '{date}' as dtRef,

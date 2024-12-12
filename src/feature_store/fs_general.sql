@@ -48,4 +48,4 @@ LEFT JOIN tb_idade as t2
 ON t1.idCustomer = t2.idCustomer
 
 LEFT JOIN customers as t3
-on t2.idCustomer = t3.idCustomer
+on t1.idCustomer = t3.idCustomer
