@@ -26,16 +26,15 @@ def ingest_date(query, table, dt):
     query_fmt = query.format(date = dt)
     # pandas faz a leitura do sql importado no banco de dados de origem
     df= pd.read_sql(query_fmt, ORIGIN_ENGINE)
-    df.head()
 
     ## Deleta os dados com a data de referência para garantir integridade
     with TARGET_ENGINE.connect() as con:
         try:
-            state = f"DELETE FROM {table} WHERE dtRef = '{dt}';"
+            state = f"DELETE FROM {table} WHERE dtRef = '{dt}';" 
             con.execute(sqlalchemy.text(state))
             con.commit()
         except exc.OperationalError as err:
-            print("Tabela ainda não existe, criando ela...")
+            print(" Tabela ainda não existe, criando...")
         
     df.to_sql(table, TARGET_ENGINE, index=False, if_exists='append')
 
