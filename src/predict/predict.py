@@ -4,6 +4,9 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy import exc
 
+print("Iniciando Script de modelos!")
+
+print("Carregando modelos salvos.")
 model_series = pd.read_pickle("../../models/rf_model_fim.pkl")
 model_series
 
@@ -11,6 +14,7 @@ model_series
 
 engine = sqlalchemy.create_engine("sqlite:///../../data/feature_store.db")
 
+print("Carregando base de dados")
 with open("etl.sql", "r") as open_file:
     query = open_file.read()
 
@@ -18,9 +22,11 @@ df = pd.read_sql(query, engine)
 df
 # %%
 
+print("Realizando predições")
 pred = model_series['model'].predict_proba(df[model_series['features']])
 proba_churn = pred[:,1]
 
+print("Persistindo dados")
 df_predict = df[['dtRef', "idCustomer"]].copy()
 df_predict['probaChurn'] = proba_churn.copy()
 
@@ -38,5 +44,5 @@ with engine.connect() as con:
         print("Tabela ainda não existe...")
 
 df_predict.to_sql("tb_churn", engine, if_exists='append', index=False)
-
+print("Sucesso!")
 # %%
